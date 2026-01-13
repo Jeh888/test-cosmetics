@@ -5,6 +5,7 @@ import FAQAccordion from '@/components/FAQAccordion';
 import { getServiceBySlug, getAllServiceSlugs } from '@/data/services';
 import { getBoroughs } from '@/data/locations';
 import { getFaqsByTreatment } from '@/data/faqs';
+import { getBlogsByService } from '@/data/blogs';
 
 export async function generateStaticParams() {
   return getAllServiceSlugs().map((slug) => ({ service: slug }));
@@ -29,6 +30,7 @@ export default function ServicePage({ params }) {
 
   const boroughs = getBoroughs();
   const faqs = getFaqsByTreatment(service.slug);
+  const relatedBlogs = getBlogsByService(service.slug);
 
   return (
     <>
@@ -157,6 +159,51 @@ export default function ServicePage({ params }) {
               {service.name} FAQs
             </h2>
             <FAQAccordion faqs={faqs} />
+          </div>
+        </section>
+      )}
+
+      {/* Related Articles */}
+      {relatedBlogs.length > 0 && (
+        <section className="py-16 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-8">
+              {service.name} Guides & Articles
+            </h2>
+            <div className="grid md:grid-cols-3 gap-6">
+              {relatedBlogs.slice(0, 3).map((blog) => (
+                <article 
+                  key={blog.slug}
+                  className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition"
+                >
+                  <Link href={`/blog/${blog.slug}`}>
+                    <div className="aspect-video bg-gray-100 overflow-hidden">
+                      <img 
+                        src={blog.image} 
+                        alt={blog.title}
+                        className="w-full h-full object-cover hover:scale-105 transition duration-300"
+                      />
+                    </div>
+                  </Link>
+                  <div className="p-5">
+                    <div className="text-sm text-gray-500 mb-2">{blog.readTime}</div>
+                    <Link href={`/blog/${blog.slug}`}>
+                      <h3 className="font-semibold text-gray-900 hover:text-primary-600 transition line-clamp-2">
+                        {blog.title}
+                      </h3>
+                    </Link>
+                  </div>
+                </article>
+              ))}
+            </div>
+            <div className="text-center mt-8">
+              <Link
+                href="/blog"
+                className="text-primary-600 font-semibold hover:text-primary-700"
+              >
+                View All Articles →
+              </Link>
+            </div>
           </div>
         </section>
       )}
